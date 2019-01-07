@@ -42,9 +42,9 @@ def nextTurn():
     global player1Turn
     player1Turn = not player1Turn
 
-def resetAndDisplayBoard():
+def resetBoard():
+    global boardList
     boardList = ["1", "2", "3", "4", "5", "6", "7","8", "9"]
-    displayBoard()
 
 def displayBoard():
     print("\t %s| %s |%s "%(boardList[0],boardList[1],boardList[2]))
@@ -88,7 +88,7 @@ def checkWinner():
 
 def isIndexValid(index):
     index = int(index)
-    if(boardList[index] not in defaultList):
+    if((index < 0 or index >8) or boardList[index] not in defaultList):
         print("Your entered index is not valid")
         return False
     return True
@@ -98,21 +98,21 @@ def botsMove():
     """Our priority should be the corner boxes and then the other boxes"""
     """if there is not index possible it returns -1"""
     #First we need to check if bot can win the game
-    indexes = ("0","2","6","8","1","3","5","7","4") # This tuple is in the priority in which we would like to fill the boxes
+    indexes = ("0","2","6","8","4","1","3","5","7") # This tuple is in the priority in which we would like to fill the boxes
     for index in indexes:
-        print("Bot Winning Index = ",index)
+        # print("Bot Winning Index = ",index)
         if(isIndexValid(index)):
             if(isWinMove(index,botSymbol)):
                 return int(index)
 
     for index in indexes:
-        print("User Winning Index = ",index)
+        # print("User Winning Index = ",index)
         if(isIndexValid(index)):
             if(isWinMove(index,userSymbol)):
                 return int(index)
 
     for index in indexes:
-        print("Other Index = ",index)
+        # print("Other Index = ",index)
         if(isIndexValid(index)):
             return int(index)
     return -1
@@ -134,7 +134,7 @@ def isWinMove(index,playerSymbol):
     boardList[index] = playerSymbol
     for i in range(0,8):
         correctIndexes = indexesToBeChecked[i]
-        print("correct indexes are ",correctIndexes)
+        # print("correct indexes are ",correctIndexes)
         if (index in correctIndexes):
             if(boardList[correctIndexes[0]] == boardList[correctIndexes[1]] and boardList[correctIndexes[1]] == boardList[correctIndexes[2]]):
                 boardList[index] = str(index + 1)
@@ -144,12 +144,17 @@ def isWinMove(index,playerSymbol):
     return False
 
 def startGame():
+    resetBoard()
     displayRules()
     AskIfBotGame()
     askIfWantsToStartAndAssignSymbol()
     index = 10
     while(checkWinner() == None and not boardIsFull()):
         displayBoard()
+        if(player1Turn):
+            print("\n\tplayer1 turn")
+        else:
+            print("\n\tplayer2/bot turn")
         if(ifBotGame()):
             if(player1Turn):
                 index = userMove()
@@ -159,9 +164,15 @@ def startGame():
             index = userMove()
         if(player1Turn):
             boardList[index-1] = userSymbol
+        elif(not ifBotGame()):
+            boardList[index - 1] = botSymbol
         else:
             boardList[index] = botSymbol
         nextTurn()
     print("Winner is",checkWinner())
+    inp = input("Press 1 to continue else press any other to exit")
+    if(inp == "1"):
+           resetBoard()
+           startGame()
 
 startGame()

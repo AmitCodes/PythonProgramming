@@ -36,9 +36,11 @@ def ifBotGame():
     return botGame
 
 def playerOneTurn():
+    """Getter function to check if it is player one's turn"""
     return player1Turn
 
 def nextTurn():
+    """sets the gloabl variable to signify the other player's turn"""
     global player1Turn
     player1Turn = not player1Turn
 
@@ -60,6 +62,7 @@ def askIfWantsToStartAndAssignSymbol():
     assignSymbol(userWantsToStart = (wantToStart == "Y"))
 
 def assignSymbol(userWantsToStart):
+    """ Assigns symbol to the players. The player playing first is assigned 'X' and other as 'O' """
     global userSymbol
     global botSymbol
     if(userWantsToStart):
@@ -87,6 +90,7 @@ def checkWinner():
     return symbol
 
 def isIndexValid(index):
+    """Checks if the entered index is valid"""
     index = int(index)
     if((index < 0 or index >8) or boardList[index] not in defaultList):
         print("Your entered index is not valid")
@@ -105,12 +109,13 @@ def botsMove():
             if(isWinMove(index,botSymbol)):
                 return int(index)
 
+    #Check if other player can win the next game
     for index in indexes:
         # print("User Winning Index = ",index)
         if(isIndexValid(index)):
             if(isWinMove(index,userSymbol)):
                 return int(index)
-
+    # get a valid index
     for index in indexes:
         # print("Other Index = ",index)
         if(isIndexValid(index)):
@@ -126,6 +131,7 @@ def userMove():
     return index
 
 def isWinMove(index,playerSymbol):
+    """This returns if the index being filled makes a win. Returns true if win use case else false"""
     indexesToBeChecked = [(0, 1, 2), (3, 4, 5), (6, 7, 8),
                           (0, 3, 6), (1, 4, 7), (2, 5, 8),
                           (0, 4, 8), (2, 4, 6)]
@@ -144,6 +150,7 @@ def isWinMove(index,playerSymbol):
     return False
 
 def startGame():
+    """Main function which actually uses the functions and starts the game"""
     resetBoard()
     displayRules()
     AskIfBotGame()

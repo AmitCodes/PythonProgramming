@@ -1,0 +1,232 @@
+# This is a tic-tac-toe game having support of bot or can be played manually
+# The player gets the chance first. The player to start gets the "X" symbol by default.
+# User enters the index which he/she needs to update.
+# The board basically can be accessed entering the index of the place
+
+boardList = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+defaultList = ("1", "2", "3", "4", "5", "6", "7", "8", "9")
+player1Turn = False
+botGame = False
+userSymbol = ""
+botSymbol = ""
+
+
+def displayRules():
+    """This function displays the rules which needs to be followed to play the game"""
+    print("""Enter the index which needs to be filled whenever it is your turn which you will be notified when
+                                        playing the game 
+                                    This is how the board looks 
+                                             1| 2 |3
+                                            --|---|--
+                                             4| 5 |6
+                                            --|---|--
+                                             7| 8 |9 
+
+where the numbers represents the index which you need to enter during your turn to represent your choice.
+If any index is already filled will be shown by symbol "0" or "X" """)
+
+
+def AskIfBotGame():
+    userChoice = input("Please let us know if you want to play with a bot \n Enter 'Y' for 'Yes' and 'N' for 'No'")
+    global botGame
+    if (userChoice.lower() == "y"):
+        botGame = True
+    else:
+        botGame = False
+
+
+def ifBotGame():
+    return botGame
+
+
+def playerOneTurn():
+    """Getter function to check if it is player one's turn"""
+    return player1Turn
+
+
+def nextTurn():
+    """sets the gloabl variable to signify the other player's turn"""
+    global player1Turn
+    player1Turn = not player1Turn
+
+
+def resetBoard():
+    global boardList
+    boardList = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+
+def displayBoard():
+    print("\t %s| %s |%s " % (boardList[0], boardList[1], boardList[2]))
+    print("\t--|---|--")
+    print("\t %s| %s |%s " % (boardList[3], boardList[4], boardList[5]))
+    print("\t--|---|--")
+    print("\t %s| %s |%s " % (boardList[6], boardList[7], boardList[8]))
+
+
+def askIfWantsToStartAndAssignSymbol():
+    wantToStart = input("Do you want to start , please enter 'Y' to start else 'N'")
+    global player1Turn
+    player1Turn = wantToStart.lower() == "y"
+    assignSymbol(userWantsToStart=(wantToStart.lower() == "y"))
+
+
+def assignSymbol(userWantsToStart):
+    """ Assigns symbol to the players. The player playing first is assigned 'X' and other as 'O' """
+    global userSymbol
+    global botSymbol
+    if (userWantsToStart):
+        userSymbol = "X"
+        botSymbol = "O"
+    else:
+        userSymbol = "O"
+        botSymbol = "X"
+    print("You have been assigned the symbol", userSymbol, "and player2/bot has the symbol", botSymbol)
+
+
+def boardIsFull():
+    for i in range(0, len(boardList)):
+        if (boardList[i] in defaultList):
+            return False
+    return True
+
+
+def checkWinner():
+    """ This function checks if there is any winner and returns the symbol of the winner. If no one is the winner it returns 'None' """
+    symbol = None
+    indexesToBeChecked = ((0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6))
+    for correctIndexes in indexesToBeChecked:
+        if (boardList[correctIndexes[0]] == boardList[correctIndexes[1]] == boardList[correctIndexes[2]]):
+            symbol = boardList[correctIndexes[0]];
+            break;
+    return symbol
+
+
+def isIndexValid(index):
+    """Checks if the entered index is valid"""
+    index = int(index)
+    if ((index < 0 or index > 8) or boardList[index] not in defaultList):
+        # print("Your entered index is not valid")
+        return False
+    return True
+
+
+def botsMove():
+    """This will return the index which bot will be chosing"""
+    """Our priority should be the corner boxes and then the other boxes"""
+    """if there is not index possible it returns -1"""
+    # First we need to check if bot can win the game
+    indexes = ( "4","0", "2", "6", "8", "1", "3", "5","7")  # This tuple is in the priority in which we would like to fill the boxes
+    for index in indexes:
+        # print("Bot Winning Index = ",index)
+        if (isIndexValid(index)):
+            if (isWinMove(index, botSymbol)):
+                return int(index)
+
+    # Check if other player can win the next game
+    for index in indexes:
+        # print("User Winning Index = ",index)
+        if (isIndexValid(index)):
+            if (isWinMove(index, userSymbol)):
+                return int(index)
+    # get a valid index
+    most_valid_index = -1
+    #Assigning the first guess what bot makes seeing the priority tuple being used above
+    for index in indexes:
+        # print("Other Index = ",index)
+        if (isIndexValid(index)):
+            most_valid_index = index
+            break
+
+
+    max_win_count = 0
+    #This part goes to the next level and check the number of ways the bot can win.
+    # Then updates the index which will result in maximum ways of win
+    for index in indexes:
+        if (isIndexValid(index)):
+            win_pos = countWinPositions(index,botSymbol)
+            if(win_pos > max_win_count):
+                max_win_count = win_pos
+                most_valid_index = index
+    return int(most_valid_index)
+
+def countWinPositions(index,symbol):
+    """This funnction returns the number of ways one can win in the next move after the given index"""
+    # print("Count win Position")
+    global boardList
+    index = int(index)
+    count = 0
+    indexes = ("4","0", "2", "6", "8", "1", "3", "5","7")  # This tuple is in the priority in which we would like to fill the boxes
+    global boardList
+    boardList[index] = symbol
+    str_index = str(index)
+    for str_index in indexes:
+        if(isIndexValid(str_index) and isWinMove(str_index,botSymbol)):
+            count += 1
+    boardList[index] = str(index+1)
+    return count
+
+
+def userMove():
+    """This will return the index which user will be chosing"""
+    index = int(input("Chose your box for the next move"))
+    while (not isIndexValid(index - 1)):
+        index = int(input("Chose your box for the next move"))
+    return index
+
+
+def isWinMove(index, playerSymbol):
+    """This returns if the index being filled makes a win. Returns true if win use case else false"""
+    indexesToBeChecked = [(0, 1, 2), (3, 4, 5), (6, 7, 8),
+                          (0, 3, 6), (1, 4, 7), (2, 5, 8),
+                          (0, 4, 8), (2, 4, 6)]
+    index = int(index)
+    global boardList
+    boardList[index] = playerSymbol
+    for i in range(0, 8):
+        correctIndexes = indexesToBeChecked[i]
+        # print("correct indexes are ",correctIndexes)
+        if (index in correctIndexes):
+            if (boardList[correctIndexes[0]] == boardList[correctIndexes[1]] and boardList[correctIndexes[1]] ==
+                    boardList[correctIndexes[2]]):
+                boardList[index] = str(index + 1)
+                return True
+
+    boardList[index] = str(index + 1)
+    return False
+
+
+def startGame():
+    """Main function which actually uses the functions and starts the game"""
+    resetBoard()
+    displayRules()
+    AskIfBotGame()
+    askIfWantsToStartAndAssignSymbol()
+    index = 10
+    while (checkWinner() == None and not boardIsFull()):
+        displayBoard()
+        if (player1Turn):
+            print("\n\tplayer1 turn")
+        else:
+            print("\n\tplayer2/bot turn")
+        if (ifBotGame()):
+            if (player1Turn):
+                index = userMove()
+            else:
+                index = botsMove()
+        else:
+            index = userMove()
+        if (player1Turn):
+            boardList[index - 1] = userSymbol
+        elif (not ifBotGame()):
+            boardList[index - 1] = botSymbol
+        else:
+            boardList[index] = botSymbol
+        nextTurn()
+    print("Winner is", checkWinner())
+    inp = input("Press 1 to continue else press any other to exit")
+    if (inp == "1"):
+        resetBoard()
+        startGame()
+
+
+startGame()

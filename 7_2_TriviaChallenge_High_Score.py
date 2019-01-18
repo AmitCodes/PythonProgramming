@@ -1,6 +1,9 @@
 import pickle as pick
 import os
 
+# Trivia challenge. Here a file contains questions and its options.
+# The next line to option contains correct answer and next to correct answer contains the score for the question
+
 # Maintain a file which will store the questions and answers
 # The file should also maintain a score for each question.
 # Also the total score for the session and highest score

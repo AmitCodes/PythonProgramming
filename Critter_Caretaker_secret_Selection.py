@@ -13,6 +13,9 @@ class Caretaker:
         print("Please enter your choice as mentioned below to interact with the critter")
         print(" Enter 1 to 'Play' , Enter 2 to feed , Enter 3 to check its mood , Enter 4 to exit ")
 
+    @property
+    def name(self):
+        return self.__name
     def getChoice(self):
         inp = int(input("Enter your choice"))  # inp is an integer
         return inp
